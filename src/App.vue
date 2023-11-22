@@ -8,5 +8,8 @@ import AppLayout from './components/AppLayout.vue';
   </AppLayout>
 </template>
 
-<style scoped>
+<style>
+body {
+  overflow: hidden;
+}
 </style>
