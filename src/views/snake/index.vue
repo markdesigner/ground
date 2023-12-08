@@ -1,9 +1,14 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
+import successSound from '../../assets/audio/success.mp3';
+import failSound from '../../assets/audio/fail.mp3';
+
+
 const canvas = ref();
 const ROW = 14;
 const COLUMN = 14;
 const pixelSize = 50;
+const audioMap = {};
 let isCollision = ref(false);
 let level = 400;
 let score = ref(0);
@@ -54,6 +59,7 @@ const checkIfCollideWithApple = () => {
     makeSnakeLonger();
     addScore();
     levelUp();
+    playAudio('success');
   }
 }
 const levelUp = () => {
@@ -70,6 +76,7 @@ const checkIfCollideBounding = () => {
   if(newHeadCoordinate.x < 0 || newHeadCoordinate.x >= COLUMN || newHeadCoordinate.y < 0 || newHeadCoordinate.y >= ROW) {
     clearArena();
     isCollision.value = true;
+    playAudio('fail');
     setTimeout(() => {
       isCollision.value = false;
     }, 2000);
@@ -179,13 +186,24 @@ const initParameter = () => {
   isCollision.value = false;
 }
 const startGame = () => {
-
   initParameter();
   updateCanvas();
 };
+const createAudio = () => {
+  const successAudio = document.createElement('audio');
+  successAudio.src = successSound;
+  audioMap.success = successAudio;
+  const failAudio = document.createElement('audio');
+  failAudio.src = failSound;
+  audioMap.fail = failAudio;
+}
+const playAudio = (type) => {
+  audioMap[type].play();
+}
 onMounted(() => {
   initailize();
   drawArena();
+  createAudio();
   document.addEventListener("keydown", (e) => {
     if (e.key === "ArrowLeft") {
       snake.direction = {
@@ -227,6 +245,7 @@ const clearArena = () => {
 <template>
   <div class="snake">
     <h1>貪吃蛇大作戰</h1>
+    <button @click="playAudio">播放</button>
     <div v-if="isCollision" class="alert-container">撞牆了</div>
     <button @click="startGame">開始遊戲</button>
     <div class="score"><h1>{{ score }}</h1></div>
